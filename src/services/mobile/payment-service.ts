@@ -13,6 +13,8 @@ const paymentSystems: PaymentSystem[] = [
     settlementWindow: 'Instant',
     averageProcessingTimeMs: 1800,
     feesLabel: '0.8% + tokenized card fees',
+    stepsRequired: 3,
+    deepLinkReady: true,
     mobileOptimized: true,
     supportedWalletIds: ['apple-wallet', 'paypal', 'revolut', 'monzo'],
     description: 'One-tap iOS checkout using Face ID and secure element tokenization.',
@@ -23,6 +25,8 @@ const paymentSystems: PaymentSystem[] = [
     settlementWindow: 'Instant',
     averageProcessingTimeMs: 1900,
     feesLabel: '0.8% + network fees',
+    stepsRequired: 3,
+    deepLinkReady: true,
     mobileOptimized: true,
     supportedWalletIds: ['google-wallet', 'samsung-wallet', 'paypal', 'cash-app'],
     description: 'Android-native payment flow with deep-link approval.',
@@ -33,6 +37,8 @@ const paymentSystems: PaymentSystem[] = [
     settlementWindow: 'Under 2 seconds',
     averageProcessingTimeMs: 950,
     feesLabel: '0.25% platform fee',
+    stepsRequired: 2,
+    deepLinkReady: true,
     mobileOptimized: true,
     supportedWalletIds: ['paypal', 'cash-app', 'venmo', 'coinbase-wallet', 'phantom'],
     description: 'Uses stored balance for the fastest repeat energy purchases.',
@@ -43,6 +49,8 @@ const paymentSystems: PaymentSystem[] = [
     settlementWindow: '2 to 4 seconds',
     averageProcessingTimeMs: 2800,
     feesLabel: '0.4% open banking fee',
+    stepsRequired: 3,
+    deepLinkReady: true,
     mobileOptimized: true,
     supportedWalletIds: ['apple-wallet', 'google-wallet', 'revolut', 'monzo', 'mpesa'],
     description: 'Push payments with account balance verification before settlement.',
@@ -53,6 +61,8 @@ const paymentSystems: PaymentSystem[] = [
     settlementWindow: '3 to 5 seconds',
     averageProcessingTimeMs: 3200,
     feesLabel: '0.35% regulated API fee',
+    stepsRequired: 3,
+    deepLinkReady: true,
     mobileOptimized: true,
     supportedWalletIds: ['revolut', 'monzo', 'paypal', 'apple-wallet', 'google-wallet'],
     description: 'Bank app redirect with immediate balance sync and consented payment initiation.',
@@ -63,6 +73,8 @@ const paymentSystems: PaymentSystem[] = [
     settlementWindow: '2 to 4 seconds',
     averageProcessingTimeMs: 2400,
     feesLabel: '0.3% merchant-present fee',
+    stepsRequired: 3,
+    deepLinkReady: false,
     mobileOptimized: true,
     supportedWalletIds: ['mpesa', 'paypal', 'cash-app', 'venmo', 'phantom'],
     description: 'Scan-to-settle flows for field energy settlement and local transfers.',
@@ -73,30 +85,42 @@ const bankAccounts: BankAccountConnection[] = [
   {
     id: 'bank-1',
     bankName: 'Monzo',
+    mobileApp: 'Monzo US',
+    provider: 'Direct API',
     accountLabel: 'Operating Balance',
     accountType: 'checking',
     currency: 'USD',
     availableBalance: 18240.33,
+    supportsInstantPayments: true,
+    connectionHealth: 'healthy',
     syncStatus: 'synced',
     lastSyncedAt: '2026-03-24T09:33:00.000Z',
   },
   {
     id: 'bank-2',
     bankName: 'Revolut Business',
+    mobileApp: 'Revolut Business',
+    provider: 'TrueLayer',
     accountLabel: 'Trading Float',
     accountType: 'treasury',
     currency: 'USD',
     availableBalance: 42890.1,
+    supportsInstantPayments: true,
+    connectionHealth: 'healthy',
     syncStatus: 'synced',
     lastSyncedAt: '2026-03-24T09:32:40.000Z',
   },
   {
     id: 'bank-3',
     bankName: 'Community Solar CU',
+    mobileApp: 'Community Solar CU',
+    provider: 'Plaid',
     accountLabel: 'Reserve Savings',
     accountType: 'savings',
     currency: 'USD',
     availableBalance: 9760.55,
+    supportsInstantPayments: false,
+    connectionHealth: 'monitoring',
     syncStatus: 'synced',
     lastSyncedAt: '2026-03-24T09:31:20.000Z',
   },
@@ -125,17 +149,17 @@ function feeRateForRail(rail: PaymentSystem['id']) {
 }
 
 export const paymentService = {
-  async listPaymentSystems() {
+  async listPaymentSystems(): Promise<PaymentSystem[]> {
     await delay(120)
     return paymentSystems
   },
 
-  async listBankAccounts() {
+  async listBankAccounts(): Promise<BankAccountConnection[]> {
     await delay(150)
     return bankAccounts
   },
 
-  async syncBankAccounts() {
+  async syncBankAccounts(): Promise<BankAccountConnection[]> {
     await delay(360)
     return bankAccounts.map((account, index) => ({
       ...account,

@@ -6,6 +6,8 @@ describe('mobileWalletService', () => {
 
     expect(wallets).toHaveLength(12)
     expect(wallets.every((wallet) => wallet.supportsNativeDeepLink)).toBe(true)
+    expect(wallets.every((wallet) => wallet.averageOperationTimeMs < 1000)).toBe(true)
+    expect(wallets.filter((wallet) => wallet.supportsBankLinking).length).toBeGreaterThanOrEqual(7)
   })
 
   it('connects a wallet with sub-second approval timing', async () => {
@@ -22,5 +24,15 @@ describe('mobileWalletService', () => {
     expect(sync.crossDeviceContinuity).toBe(true)
     expect(sync.devices.length).toBeGreaterThanOrEqual(3)
     expect(sync.syncTimeMs).toBeLessThan(1000)
+    expect(sync.pendingConflicts).toBe(0)
+  })
+
+  it('returns analytics for flow reduction and security audit posture', async () => {
+    const analytics = await mobileWalletService.getWalletAnalytics()
+
+    expect(analytics.averagePaymentTimeMs).toBeLessThan(5000)
+    expect(analytics.paymentFlow.reducedStepsPercent).toBeGreaterThanOrEqual(50)
+    expect(analytics.securityAudit.status).toBe('pass')
+    expect(analytics.securityAudit.standards).toContain('PCI DSS')
   })
 })

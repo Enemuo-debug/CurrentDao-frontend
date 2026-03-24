@@ -5,6 +5,9 @@ import {
   WalletSyncSnapshot,
 } from '@/types/mobile-wallet'
 
+const institutionalStandards = ['PCI DSS', 'PSD2', 'Biometric MFA', 'Device Integrity'] as const
+const enhancedStandards = ['PCI DSS', 'SOC 2', 'Biometric MFA'] as const
+
 const mobileWalletCatalog: MobileWalletProvider[] = [
   {
     id: 'apple-wallet',
@@ -18,7 +21,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 99,
     riskScore: 95,
+    energyTradingFeatures: ['one-tap energy checkout', 'biometric approvals', 'tokenized utility cards'],
+    bankingAppIds: ['monzo-us', 'revolut-business'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -26,6 +32,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'secure-enclave',
       securityTier: 'institutional',
       complianceBadges: ['PCI DSS', 'PSD2', 'Biometric MFA'],
+      standards: [...institutionalStandards],
     },
   },
   {
@@ -40,7 +47,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 98,
     riskScore: 93,
+    energyTradingFeatures: ['native energy passes', 'deep-link approvals', 'tokenized meter payments'],
+    bankingAppIds: ['revolut-business', 'monzo-us'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -48,6 +58,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'hardware-backed',
       securityTier: 'institutional',
       complianceBadges: ['PCI DSS', 'Device Integrity', 'Tokenized Payments'],
+      standards: [...institutionalStandards, 'Tokenized Payments'],
     },
   },
   {
@@ -62,7 +73,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 97,
     riskScore: 91,
+    energyTradingFeatures: ['Knox-secured approvals', 'utility credential storage', 'fast merchant-present pay'],
+    bankingAppIds: ['revolut-business'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -70,6 +84,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'hardware-backed',
       securityTier: 'institutional',
       complianceBadges: ['Samsung Knox', 'Tokenized Cards', 'Biometric MFA'],
+      standards: [...institutionalStandards, 'Tokenized Payments'],
     },
   },
   {
@@ -84,7 +99,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 95,
     riskScore: 90,
+    energyTradingFeatures: ['stored balance settlement', 'merchant QR fallback', 'instant top ups'],
+    bankingAppIds: ['monzo-us', 'community-solar-cu'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -92,6 +110,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['PCI DSS', 'Fraud Shield'],
+      standards: [...enhancedStandards],
     },
   },
   {
@@ -106,7 +125,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 93,
     riskScore: 88,
+    energyTradingFeatures: ['wallet balance checkout', 'repeat purchase shortcuts', 'utility pay requests'],
+    bankingAppIds: ['community-solar-cu'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -114,6 +136,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['Biometric MFA', 'Fraud Shield'],
+      standards: [...enhancedStandards],
     },
   },
   {
@@ -128,7 +151,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 91,
     riskScore: 87,
+    energyTradingFeatures: ['consumer funding flows', 'stored contacts for cooperatives', 'instant balance checks'],
+    bankingAppIds: ['community-solar-cu'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -136,6 +162,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['Biometric MFA', 'Velocity Checks'],
+      standards: [...enhancedStandards],
     },
   },
   {
@@ -150,7 +177,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 96,
     riskScore: 92,
+    energyTradingFeatures: ['open banking auth', 'real-time balance sync', 'virtual card fallback'],
+    bankingAppIds: ['revolut-business'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -158,6 +188,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'institutional',
       complianceBadges: ['PSD2', 'Biometric MFA', 'Card Controls'],
+      standards: [...institutionalStandards],
     },
   },
   {
@@ -172,7 +203,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 90,
     riskScore: 86,
+    energyTradingFeatures: ['utility QR settlement', 'agent assisted cash in', 'offline resilience'],
+    bankingAppIds: ['community-solar-cu'],
     security: {
       biometricAuth: false,
       deviceBinding: true,
@@ -180,6 +214,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['SIM Binding', 'Fraud Monitoring'],
+      standards: ['PCI DSS', 'SOC 2'],
     },
   },
   {
@@ -194,7 +229,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 97,
     riskScore: 90,
+    energyTradingFeatures: ['budget-aware energy spend', 'real-time balance checks', 'bank app redirect'],
+    bankingAppIds: ['monzo-us'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -202,6 +240,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'institutional',
       complianceBadges: ['PSD2', 'Real-time Alerts'],
+      standards: [...institutionalStandards],
     },
   },
   {
@@ -216,7 +255,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: false,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 92,
     riskScore: 89,
+    energyTradingFeatures: ['stablecoin settlement', 'self-custody escrow', 'tokenized REC support'],
+    bankingAppIds: [],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -224,6 +266,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['Seed Vault', 'Biometric MFA'],
+      standards: [...enhancedStandards],
     },
   },
   {
@@ -238,7 +281,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: false,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 89,
     riskScore: 84,
+    energyTradingFeatures: ['programmable approvals', 'gas aware signing', 'energy token swaps'],
+    bankingAppIds: [],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -246,6 +292,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['Transaction Simulation', 'Biometric MFA'],
+      standards: [...enhancedStandards],
     },
   },
   {
@@ -260,7 +307,10 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: false,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 94,
     riskScore: 85,
+    energyTradingFeatures: ['fast signing', 'energy pool positions', 'mobile-first repeat purchases'],
+    bankingAppIds: [],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -268,6 +318,7 @@ const mobileWalletCatalog: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['Transaction Previews', 'Biometric MFA'],
+      standards: [...enhancedStandards],
     },
   },
 ]
@@ -279,6 +330,27 @@ const analyticsSnapshot: WalletAnalyticsSnapshot = {
   averagePaymentTimeMs: 2800,
   preferredPaymentRail: 'instant-bank',
   peakUsageWindow: '6:00 PM - 9:00 PM',
+  topWallets: ['Apple Wallet', 'Google Wallet', 'Revolut', 'Phantom'],
+  usagePatterns: [
+    { label: 'Repeat buyers', share: 0.42 },
+    { label: 'First-time mobile users', share: 0.24 },
+    { label: 'Bank-funded settlements', share: 0.21 },
+    { label: 'Wallet balance settlements', share: 0.13 },
+  ],
+  paymentFlow: {
+    previousStepCount: 6,
+    optimizedStepCount: 3,
+    reducedStepsPercent: 50,
+    medianCompletionMs: 2800,
+    walletOperationBudgetMs: 1000,
+  },
+  securityAudit: {
+    status: 'pass',
+    standards: ['PCI DSS', 'PSD2', 'SOC 2', 'Biometric MFA', 'Device Integrity'],
+    biometricCoveragePercent: 92,
+    fraudDetectionLatencyMs: 310,
+    lastAuditAt: '2026-03-20T16:00:00.000Z',
+  },
 }
 
 function delay(ms: number) {
@@ -291,7 +363,7 @@ function createWalletAddress(walletId: string) {
 }
 
 export const mobileWalletService = {
-  async listWallets() {
+  async listWallets(): Promise<MobileWalletProvider[]> {
     await delay(120)
     return mobileWalletCatalog
   },
@@ -336,6 +408,7 @@ export const mobileWalletService = {
       syncCoveragePercent: 99,
       syncTimeMs: 640,
       crossDeviceContinuity: true,
+      pendingConflicts: 0,
       lastConflictResolvedAt: '2026-03-24T09:15:00.000Z',
     }
   },

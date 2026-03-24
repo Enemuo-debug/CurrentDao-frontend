@@ -67,6 +67,23 @@ export function WalletSync({ syncSnapshot, analytics }: WalletSyncProps) {
                 {syncSnapshot.crossDeviceContinuity ? 'On' : 'Off'}
               </p>
             </div>
+            <div className="rounded-2xl bg-violet-50 p-4 sm:col-span-3">
+              <p className="text-xs uppercase tracking-[0.16em] text-violet-700">
+                Conflict resolution
+              </p>
+              <p className="mt-2 text-lg font-semibold text-violet-950">
+                {syncSnapshot.pendingConflicts === 0 ? 'No pending conflicts' : 'Review needed'}
+              </p>
+              <p className="mt-1 text-sm text-violet-900/80">
+                Last resolved{' '}
+                {new Date(syncSnapshot.lastConflictResolvedAt).toLocaleString([], {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })}
+              </p>
+            </div>
           </div>
         ) : null}
       </div>
@@ -102,12 +119,42 @@ export function WalletSync({ syncSnapshot, analytics }: WalletSyncProps) {
             <div className="rounded-2xl bg-amber-50 p-4">
               <div className="flex items-center gap-2 text-amber-800">
                 <Shield className="h-4 w-4" />
-                <span className="text-sm font-medium">Preferred mobile rail</span>
+                <span className="text-sm font-medium">Security audit</span>
               </div>
               <p className="mt-2 text-xl font-semibold capitalize text-slate-900">
-                {analytics.preferredPaymentRail.replace('-', ' ')}
+                {analytics.securityAudit.status}
               </p>
-              <p className="mt-1 text-sm text-slate-600">{analytics.peakUsageWindow}</p>
+              <p className="mt-1 text-sm text-slate-600">
+                {analytics.securityAudit.standards.join(', ')}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-amber-50 p-4">
+              <div className="flex items-center gap-2 text-amber-800">
+                <BarChart3 className="h-4 w-4" />
+                <span className="text-sm font-medium">Top mobile wallets</span>
+              </div>
+              <p className="mt-2 text-xl font-semibold text-slate-900">
+                {analytics.topWallets.join(', ')}
+              </p>
+              <p className="mt-1 text-sm text-slate-600">
+                Peak usage window: {analytics.peakUsageWindow}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-amber-50 p-4">
+              <div className="flex items-center gap-2 text-amber-800">
+                <Activity className="h-4 w-4" />
+                <span className="text-sm font-medium">Usage patterns</span>
+              </div>
+              <div className="mt-3 space-y-2">
+                {analytics.usagePatterns.map((pattern) => (
+                  <div key={pattern.label} className="flex items-center justify-between text-sm">
+                    <span className="text-slate-700">{pattern.label}</span>
+                    <span className="font-semibold text-slate-900">
+                      {(pattern.share * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         ) : null}

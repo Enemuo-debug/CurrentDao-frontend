@@ -1,6 +1,6 @@
 'use client'
 
-import { Building2, RefreshCw, ShieldCheck } from 'lucide-react'
+import { Building2, RefreshCw, ShieldCheck, Smartphone, Zap } from 'lucide-react'
 import { BankAccountConnection } from '@/types/mobile-wallet'
 
 interface BankingIntegrationProps {
@@ -51,7 +51,7 @@ export function BankingIntegration({ accounts, onRefresh }: BankingIntegrationPr
                   <p className="font-semibold text-slate-900">{account.bankName}</p>
                 </div>
                 <p className="mt-1 text-sm text-slate-600">
-                  {account.accountLabel} · {account.accountType}
+                  {account.accountLabel} | {account.accountType}
                 </p>
               </div>
               <div className="text-right">
@@ -66,6 +66,18 @@ export function BankingIntegration({ accounts, onRefresh }: BankingIntegrationPr
               <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1">
                 <ShieldCheck className="h-4 w-4 text-sky-700" />
                 {account.syncStatus === 'synced' ? 'Balance synced' : 'Syncing'}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1">
+                <Smartphone className="h-4 w-4 text-sky-700" />
+                {account.mobileApp}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1">{account.provider}</span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1">
+                <Zap className="h-4 w-4 text-sky-700" />
+                {account.supportsInstantPayments ? 'Instant pay enabled' : 'ACH fallback'}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 capitalize">
+                Health: {account.connectionHealth}
               </span>
               <span className="rounded-full bg-white px-3 py-1">
                 Updated{' '}

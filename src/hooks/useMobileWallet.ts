@@ -7,8 +7,10 @@ import {
   BankAccountConnection,
   MobileWalletProvider,
   PaymentExecution,
+  PaymentFlowMetrics,
   PaymentRail,
   PaymentSystem,
+  SecurityAuditReport,
   WalletAnalyticsSnapshot,
   WalletConnection,
   WalletSyncSnapshot,
@@ -83,6 +85,21 @@ export function useMobileWallet() {
   const compatiblePaymentSystems = paymentSystems.filter((system) =>
     selectedWallet ? system.supportedWalletIds.includes(selectedWallet.id) : true,
   )
+  const nativeWallets = wallets.filter((wallet) => wallet.categories.includes('native'))
+  const bankLinkedWallets = wallets.filter((wallet) => wallet.supportsBankLinking)
+  const energyOptimizedWallets = wallets.filter((wallet) =>
+    wallet.energyTradingFeatures.some((feature) => feature.toLowerCase().includes('energy')),
+  )
+  const averageWalletOperationTimeMs = wallets.length
+    ? Math.round(
+        wallets.reduce((total, wallet) => total + wallet.averageOperationTimeMs, 0) / wallets.length,
+      )
+    : 0
+  const walletPerformanceWithinTarget = wallets.every(
+    (wallet) => wallet.averageOperationTimeMs < 1000,
+  )
+  const paymentFlowMetrics: PaymentFlowMetrics | null = analytics?.paymentFlow ?? null
+  const securityAudit: SecurityAuditReport | null = analytics?.securityAudit ?? null
 
   useEffect(() => {
     if (!compatiblePaymentSystems.length) {
@@ -167,6 +184,8 @@ export function useMobileWallet() {
     bankAccounts,
     syncSnapshot,
     analytics,
+    paymentFlowMetrics,
+    securityAudit,
     selectedWallet,
     selectedWalletId,
     selectedPaymentRail,
@@ -181,5 +200,10 @@ export function useMobileWallet() {
     refreshSync,
     runPayment,
     supportedWalletCount: wallets.length,
+    nativeWalletCount: nativeWallets.length,
+    bankLinkedWalletCount: bankLinkedWallets.length,
+    energyOptimizedWalletCount: energyOptimizedWallets.length,
+    averageWalletOperationTimeMs,
+    walletPerformanceWithinTarget,
   }
 }

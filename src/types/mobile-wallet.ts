@@ -10,6 +10,16 @@ export type WalletCategory =
 
 export type SecurityTier = 'standard' | 'enhanced' | 'institutional'
 
+export type SecurityStandard =
+  | 'PCI DSS'
+  | 'PSD2'
+  | 'SOC 2'
+  | 'Tokenized Payments'
+  | 'Biometric MFA'
+  | 'Device Integrity'
+
+export type ConnectionHealth = 'healthy' | 'monitoring' | 'degraded'
+
 export type PaymentRail =
   | 'apple-pay'
   | 'google-pay'
@@ -25,6 +35,7 @@ export interface WalletSecurityProfile {
   encryption: 'AES-256' | 'hardware-backed' | 'secure-enclave'
   securityTier: SecurityTier
   complianceBadges: string[]
+  standards: SecurityStandard[]
 }
 
 export interface MobileWalletProvider {
@@ -39,7 +50,10 @@ export interface MobileWalletProvider {
   supportsEnergyTrading: boolean
   supportsBankLinking: boolean
   supportsNativeDeepLink: boolean
+  mobileReadinessScore: number
   riskScore: number
+  energyTradingFeatures: string[]
+  bankingAppIds: string[]
   security: WalletSecurityProfile
 }
 
@@ -57,6 +71,8 @@ export interface PaymentSystem {
   settlementWindow: string
   averageProcessingTimeMs: number
   feesLabel: string
+  stepsRequired: number
+  deepLinkReady: boolean
   mobileOptimized: boolean
   supportedWalletIds: string[]
   description: string
@@ -65,10 +81,14 @@ export interface PaymentSystem {
 export interface BankAccountConnection {
   id: string
   bankName: string
+  mobileApp: string
+  provider: 'Plaid' | 'TrueLayer' | 'Direct API'
   accountLabel: string
   accountType: 'checking' | 'savings' | 'treasury'
   currency: 'USD' | 'EUR' | 'GBP'
   availableBalance: number
+  supportsInstantPayments: boolean
+  connectionHealth: ConnectionHealth
   syncStatus: 'synced' | 'syncing'
   lastSyncedAt: string
 }
@@ -110,7 +130,29 @@ export interface WalletSyncSnapshot {
   syncCoveragePercent: number
   syncTimeMs: number
   crossDeviceContinuity: boolean
+  pendingConflicts: number
   lastConflictResolvedAt: string
+}
+
+export interface WalletUsagePattern {
+  label: string
+  share: number
+}
+
+export interface SecurityAuditReport {
+  status: 'pass'
+  standards: SecurityStandard[]
+  biometricCoveragePercent: number
+  fraudDetectionLatencyMs: number
+  lastAuditAt: string
+}
+
+export interface PaymentFlowMetrics {
+  previousStepCount: number
+  optimizedStepCount: number
+  reducedStepsPercent: number
+  medianCompletionMs: number
+  walletOperationBudgetMs: number
 }
 
 export interface WalletAnalyticsSnapshot {
@@ -120,4 +162,8 @@ export interface WalletAnalyticsSnapshot {
   averagePaymentTimeMs: number
   preferredPaymentRail: PaymentRail
   peakUsageWindow: string
+  topWallets: string[]
+  usagePatterns: WalletUsagePattern[]
+  paymentFlow: PaymentFlowMetrics
+  securityAudit: SecurityAuditReport
 }

@@ -1,13 +1,19 @@
 'use client'
 
-import { CreditCard, TimerReset, Wallet2 } from 'lucide-react'
-import { PaymentExecution, PaymentRail, PaymentSystem } from '@/types/mobile-wallet'
+import { CreditCard, TimerReset, Wallet2, Workflow } from 'lucide-react'
+import {
+  PaymentExecution,
+  PaymentFlowMetrics,
+  PaymentRail,
+  PaymentSystem,
+} from '@/types/mobile-wallet'
 
 interface PaymentSystemsProps {
   systems: PaymentSystem[]
   selectedRail: PaymentRail
   onSelectRail: (rail: PaymentRail) => void
   lastTransaction: PaymentExecution | null
+  paymentFlow: PaymentFlowMetrics | null
 }
 
 export function PaymentSystems({
@@ -15,6 +21,7 @@ export function PaymentSystems({
   selectedRail,
   onSelectRail,
   lastTransaction,
+  paymentFlow,
 }: PaymentSystemsProps) {
   return (
     <div className="rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm">
@@ -29,7 +36,9 @@ export function PaymentSystems({
         </div>
         <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-right">
           <p className="text-xs uppercase tracking-[0.2em] text-emerald-700">Flow reduction</p>
-          <p className="text-2xl font-semibold text-emerald-900">50%</p>
+          <p className="text-2xl font-semibold text-emerald-900">
+            {paymentFlow?.reducedStepsPercent ?? 50}%
+          </p>
         </div>
       </div>
 
@@ -73,6 +82,13 @@ export function PaymentSystems({
                   <CreditCard className="h-4 w-4 text-emerald-700" />
                   {system.feesLabel}
                 </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1">
+                  <Workflow className="h-4 w-4 text-emerald-700" />
+                  {system.stepsRequired} steps
+                </span>
+                <span className="rounded-full bg-white px-3 py-1">
+                  {system.deepLinkReady ? 'Deep-link ready' : 'QR fallback'}
+                </span>
               </div>
             </button>
           )
@@ -93,6 +109,9 @@ export function PaymentSystems({
               <p className="text-sm text-slate-300">Completed in</p>
               <p className="text-xl font-semibold">
                 {(lastTransaction.processingTimeMs / 1000).toFixed(1)}s
+              </p>
+              <p className="mt-1 text-xs uppercase tracking-[0.16em] text-emerald-200">
+                {lastTransaction.optimizationStepsSaved} steps saved
               </p>
             </div>
           </div>

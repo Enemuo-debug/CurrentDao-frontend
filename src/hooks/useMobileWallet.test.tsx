@@ -50,7 +50,10 @@ const walletsFixture: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: true,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 99,
     riskScore: 95,
+    energyTradingFeatures: ['one-tap energy checkout', 'biometric approvals'],
+    bankingAppIds: ['monzo-us'],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -58,6 +61,7 @@ const walletsFixture: MobileWalletProvider[] = [
       encryption: 'secure-enclave',
       securityTier: 'institutional',
       complianceBadges: ['PCI DSS'],
+      standards: ['PCI DSS', 'PSD2', 'Biometric MFA'],
     },
   },
   {
@@ -72,7 +76,10 @@ const walletsFixture: MobileWalletProvider[] = [
     supportsEnergyTrading: true,
     supportsBankLinking: false,
     supportsNativeDeepLink: true,
+    mobileReadinessScore: 94,
     riskScore: 85,
+    energyTradingFeatures: ['energy pool positions', 'fast signing'],
+    bankingAppIds: [],
     security: {
       biometricAuth: true,
       deviceBinding: true,
@@ -80,6 +87,7 @@ const walletsFixture: MobileWalletProvider[] = [
       encryption: 'AES-256',
       securityTier: 'enhanced',
       complianceBadges: ['Biometric MFA'],
+      standards: ['PCI DSS', 'SOC 2', 'Biometric MFA'],
     },
   },
 ]
@@ -91,6 +99,8 @@ const systemsFixture: PaymentSystem[] = [
     settlementWindow: '2 to 4 seconds',
     averageProcessingTimeMs: 2800,
     feesLabel: '0.4%',
+    stepsRequired: 3,
+    deepLinkReady: true,
     mobileOptimized: true,
     supportedWalletIds: ['apple-wallet'],
     description: 'Bank payment',
@@ -101,6 +111,8 @@ const systemsFixture: PaymentSystem[] = [
     settlementWindow: 'Under 2 seconds',
     averageProcessingTimeMs: 950,
     feesLabel: '0.25%',
+    stepsRequired: 2,
+    deepLinkReady: true,
     mobileOptimized: true,
     supportedWalletIds: ['phantom', 'apple-wallet'],
     description: 'Stored balance',
@@ -111,10 +123,14 @@ const accountsFixture: BankAccountConnection[] = [
   {
     id: 'bank-1',
     bankName: 'Monzo',
+    mobileApp: 'Monzo US',
+    provider: 'Direct API',
     accountLabel: 'Operating Balance',
     accountType: 'checking',
     currency: 'USD',
     availableBalance: 1000,
+    supportsInstantPayments: true,
+    connectionHealth: 'healthy',
     syncStatus: 'synced',
     lastSyncedAt: '2026-03-24T09:33:00.000Z',
   },
@@ -133,6 +149,7 @@ const syncFixture: WalletSyncSnapshot = {
   syncCoveragePercent: 99,
   syncTimeMs: 640,
   crossDeviceContinuity: true,
+  pendingConflicts: 0,
   lastConflictResolvedAt: '2026-03-24T09:15:00.000Z',
 }
 
@@ -143,6 +160,25 @@ const analyticsFixture: WalletAnalyticsSnapshot = {
   averagePaymentTimeMs: 2800,
   preferredPaymentRail: 'instant-bank',
   peakUsageWindow: '6:00 PM - 9:00 PM',
+  topWallets: ['Apple Wallet', 'Phantom'],
+  usagePatterns: [
+    { label: 'Repeat buyers', share: 0.6 },
+    { label: 'Bank-funded settlements', share: 0.4 },
+  ],
+  paymentFlow: {
+    previousStepCount: 6,
+    optimizedStepCount: 3,
+    reducedStepsPercent: 50,
+    medianCompletionMs: 2800,
+    walletOperationBudgetMs: 1000,
+  },
+  securityAudit: {
+    status: 'pass',
+    standards: ['PCI DSS', 'PSD2', 'SOC 2'],
+    biometricCoveragePercent: 92,
+    fraudDetectionLatencyMs: 310,
+    lastAuditAt: '2026-03-20T16:00:00.000Z',
+  },
 }
 
 const connectionFixture: WalletConnection = {
@@ -240,8 +276,10 @@ describe('useMobileWallet', () => {
     await harness.flush()
 
     expect(harness.latest()?.supportedWalletCount).toBe(2)
+    expect(harness.latest()?.nativeWalletCount).toBe(1)
     expect(harness.latest()?.selectedWalletId).toBe('apple-wallet')
     expect(harness.latest()?.selectedPaymentRail).toBe('instant-bank')
+    expect(harness.latest()?.walletPerformanceWithinTarget).toBe(true)
 
     await act(async () => {
       harness.latest()?.setSelectedWalletId('phantom')
@@ -271,6 +309,8 @@ describe('useMobileWallet', () => {
 
     expect(harness.latest()?.syncSnapshot?.crossDeviceContinuity).toBe(true)
     expect(harness.latest()?.bankAccounts).toEqual(accountsFixture)
+    expect(harness.latest()?.paymentFlowMetrics?.reducedStepsPercent).toBe(50)
+    expect(harness.latest()?.securityAudit?.status).toBe('pass')
 
     await harness.unmount()
   })

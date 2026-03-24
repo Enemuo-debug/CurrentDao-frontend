@@ -28,6 +28,8 @@ export function MobileWallet() {
     bankAccounts,
     syncSnapshot,
     analytics,
+    paymentFlowMetrics,
+    securityAudit,
     selectedWallet,
     selectedWalletId,
     selectedPaymentRail,
@@ -42,6 +44,11 @@ export function MobileWallet() {
     refreshSync,
     runPayment,
     supportedWalletCount,
+    nativeWalletCount,
+    bankLinkedWalletCount,
+    energyOptimizedWalletCount,
+    averageWalletOperationTimeMs,
+    walletPerformanceWithinTarget,
   } = useMobileWallet()
 
   async function handleConnect() {
@@ -93,28 +100,42 @@ export function MobileWallet() {
           <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-3xl border border-white/10 bg-white/10 p-4 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.16em] text-emerald-100">
-                Supported wallets
+                Wallet coverage
               </p>
-              <p className="mt-2 text-3xl font-semibold">{supportedWalletCount}+</p>
+              <p className="mt-2 text-3xl font-semibold">{supportedWalletCount} wallets</p>
+              <p className="mt-1 text-sm text-emerald-100/80">{nativeWalletCount} native</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/10 p-4 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.16em] text-emerald-100">
                 Wallet operation speed
               </p>
-              <p className="mt-2 text-3xl font-semibold">0.64s</p>
+              <p className="mt-2 text-3xl font-semibold">
+                {(averageWalletOperationTimeMs / 1000).toFixed(2)}s
+              </p>
+              <p className="mt-1 text-sm text-emerald-100/80">
+                {walletPerformanceWithinTarget ? 'Under target' : 'Needs tuning'}
+              </p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/10 p-4 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.16em] text-emerald-100">
                 Payment completion
               </p>
-              <p className="mt-2 text-3xl font-semibold">2.8s</p>
+              <p className="mt-2 text-3xl font-semibold">
+                {analytics ? (analytics.averagePaymentTimeMs / 1000).toFixed(1) : '2.8'}s
+              </p>
+              <p className="mt-1 text-sm text-emerald-100/80">
+                {bankLinkedWalletCount} bank-linked wallets
+              </p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/10 p-4 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.16em] text-emerald-100">
-                Conversion uplift
+                Energy wallets
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {analytics ? formatPercent(analytics.mobileConversionRate) : '78%'}
+                {energyOptimizedWalletCount}
+              </p>
+              <p className="mt-1 text-sm text-emerald-100/80">
+                {analytics ? formatPercent(analytics.mobileConversionRate) : '78%'} conversion
               </p>
             </div>
           </div>
@@ -126,7 +147,9 @@ export function MobileWallet() {
               <p className="text-sm uppercase tracking-[0.2em] text-emerald-100">
                 Optimized payment flow
               </p>
-              <h3 className="mt-2 text-2xl font-semibold text-white">Three taps to buy energy</h3>
+              <h3 className="mt-2 text-2xl font-semibold text-white">
+                {paymentFlowMetrics?.optimizedStepCount ?? 3} taps to buy energy
+              </h3>
             </div>
             <div className="rounded-2xl bg-white/10 p-3">
               <CreditCard className="h-6 w-6 text-emerald-100" />
@@ -145,6 +168,11 @@ export function MobileWallet() {
             <div className="flex items-center gap-3 rounded-2xl bg-white/5 px-4 py-3">
               <CheckCircle2 className="h-4 w-4 text-emerald-300" />
               Balance sync and instant settlement
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl bg-white/5 px-4 py-3">
+              <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+              Reduce checkout from {paymentFlowMetrics?.previousStepCount ?? 6} to{' '}
+              {paymentFlowMetrics?.optimizedStepCount ?? 3} steps
             </div>
           </div>
         </div>
@@ -190,14 +218,21 @@ export function MobileWallet() {
                       </div>
                       <p className="mt-3 text-lg font-semibold text-slate-900">{wallet.name}</p>
                       <p className="mt-2 text-sm text-slate-600">{wallet.description}</p>
+                      <p className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-500">
+                        Energy features
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {wallet.energyTradingFeatures.slice(0, 2).join(' | ')}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs uppercase tracking-[0.16em] text-slate-500">
-                        Operation
+                        Readiness
                       </p>
                       <p className="text-lg font-semibold text-slate-900">
-                        {wallet.averageOperationTimeMs}ms
+                        {wallet.mobileReadinessScore}
                       </p>
+                      <p className="text-xs text-slate-500">{wallet.averageOperationTimeMs}ms op time</p>
                     </div>
                   </div>
 
@@ -236,6 +271,9 @@ export function MobileWallet() {
               <p className="mt-1 text-sm text-slate-600">
                 Security tier: {selectedWallet?.security.securityTier ?? 'enhanced'}
               </p>
+              <p className="mt-2 text-sm text-slate-600">
+                Bank app links: {selectedWallet?.bankingAppIds.length ?? 0}
+              </p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -268,10 +306,18 @@ export function MobileWallet() {
                 Security integration
               </div>
               <div className="flex flex-wrap gap-2 text-sm text-slate-600">
-                <span className="rounded-full bg-white px-3 py-1">Biometric auth</span>
-                <span className="rounded-full bg-white px-3 py-1">Device binding</span>
-                <span className="rounded-full bg-white px-3 py-1">Fraud monitoring</span>
+                {(securityAudit?.standards ?? selectedWallet?.security.standards ?? []).map(
+                  (standard) => (
+                    <span key={standard} className="rounded-full bg-white px-3 py-1">
+                      {standard}
+                    </span>
+                  ),
+                )}
               </div>
+              <p className="text-sm text-slate-600">
+                Audit status: {securityAudit?.status ?? 'pass'} | Fraud detection latency:{' '}
+                {securityAudit?.fraudDetectionLatencyMs ?? 310}ms
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -312,6 +358,7 @@ export function MobileWallet() {
         selectedRail={selectedPaymentRail}
         onSelectRail={setSelectedPaymentRail}
         lastTransaction={lastTransaction}
+        paymentFlow={paymentFlowMetrics}
       />
 
       <BankingIntegration accounts={bankAccounts} onRefresh={refreshSync} />
